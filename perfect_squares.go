@@ -3,38 +3,43 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(numSquares(43))
+	fmt.Println(numSquares(48))
 }
 
 func numSquares(n int) int {
-	perfectSquares := make([]int, 0, 100)
-	counter := 0
-	currentNumber := n
+	calculated := make([]int, 0, n+1)
+	calculated = append(calculated, 0)
+	currentVal := 1
+	devider := 1
+	for currentVal <= n {
+		for {
+			square := devider * devider
+			remain := currentVal % square
+			nextSquare := (devider + 1) * (devider + 1)
+			var counter, prevCounter, last int
+			if remain > 0 {
+				for i := devider - 1; i > 0; i-- {
+					prevCounter = currentVal/(i*i) + calculated[currentVal%(i*i)]
+					if i == devider-1 || prevCounter < last {
+						last = prevCounter
+					}
+				}
+				prevCounter = last
+			}
+			counter = currentVal/square + calculated[remain]
+			if prevCounter > 0 && prevCounter < counter {
+				counter = prevCounter
+			}
 
-	var square int
-	for square <= n {
-		perfectSquares = append(perfectSquares, square)
-		counter++
-		square = counter * counter
+			calculated = append(calculated, counter)
+			if currentVal+1 == nextSquare || currentVal > n {
+				currentVal++
+				break
+			}
+			currentVal++
+		}
+		devider++
 	}
 
-	var perfectSquaresResults int
-	try := 0
-	for try < len(perfectSquares)-1 {
-		currentNumber = n
-		var perfectSquaresCounter int
-		currentDivider := len(perfectSquares) - try - 1
-		for currentNumber >= 1 && currentDivider >= 1 {
-			ceilPerfectNumbers := currentNumber / perfectSquares[currentDivider]
-			currentNumber -= perfectSquares[currentDivider] * ceilPerfectNumbers
-			perfectSquaresCounter += ceilPerfectNumbers
-			currentDivider--
-		}
-		if try == 0 || perfectSquaresCounter != 0 && perfectSquaresCounter < perfectSquaresResults {
-			perfectSquaresResults = perfectSquaresCounter
-		}
-		try++
-	}
-
-	return perfectSquaresResults
+	return calculated[n]
 }
